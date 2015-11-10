@@ -1,0 +1,54 @@
+<script src="script/at-doc-parser.js">
+</script>
+<link rel="import" href="../at-core-activity/at-core-activity.html">
+
+<dom-module id="at-doc-parser">
+  <style>
+
+  </style>
+  <template>
+    <at-core-activity id="loader" url={{url}} auto="true" handle-as="text"></at-core-activity>
+  </template>
+  <script>
+    'use strict';
+    Polymer({
+      is: 'at-doc-parser',
+      properties: {
+        url: {
+          type: String,
+          value: ''
+        },
+        value: {
+          type: Object,
+          value: ''
+        }
+      },
+      _scopeCssViaAttr: true,
+      ready: function() {
+        var
+          loader = this.$.loader,
+          url = this.url,
+          self = this;
+        loader.addEventListener('response', function(event) {
+          var text = event.detail;
+
+          if (text) {
+            var entities = ContextFreeParser.parse(text);
+            if (!entities || entities.length === 0) {
+              entities = [{
+                name: url.split('/').pop(),
+                description: '**Undocumented**'
+              }];
+            }
+            self.value = {
+              classes: entities
+            };
+            self.fire('value-changed', {
+              value: self.value
+            });
+          }
+        });
+      }
+    });
+  </script>
+</dom-module>
