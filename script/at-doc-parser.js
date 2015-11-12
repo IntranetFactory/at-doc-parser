@@ -1,7 +1,7 @@
 
 (function(scope) {
 
-  var ContextFreeParser = {
+  var DocParser = {
     parse: function(text) {
       var top = {};
       var entities = [];
@@ -140,9 +140,9 @@
   };
 
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ContextFreeParser;
+    module.exports = DocParser;
   } else {
-    scope.ContextFreeParser = ContextFreeParser;
+    scope.DocParser = DocParser;
   }
 
 })(this);
