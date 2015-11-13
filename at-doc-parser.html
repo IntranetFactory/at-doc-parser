@@ -28,23 +28,59 @@
           loader = this.$.loader,
           url = this.url,
           self = this;
+
+        var _isFunction = function(obj) {
+          return Object.prototype.toString.apply(obj) === "[object Function]";
+        }
+
         loader.addEventListener('response', function(event) {
           var text = event.detail;
 
           if (text) {
-            var entities = DocParser.parse(text);
-            if (!entities || entities.length === 0) {
-              entities = [{
-                name: url.split('/').pop(),
-                description: '**Undocumented**'
-              }];
-            }
-            self.value = {
-              classes: entities
-            };
-            self.fire('value-changed', {
-              value: self.value
+
+            self.importHref(self.url, function(event) {
+              // import successful
+              var importedContent = event.target.import;
+              var domModule = importedContent.querySelector('dom-module');
+              var elementName = domModule.getAttribute('id');
+              var element = document.createElement(elementName);
+              // we need this to find out the function names
+              var elementProto = element.__proto__;
+              var entity = {
+                name: elementName,
+                description: elementName,
+                properties: [],
+                methods: [],
+                events: []
+              };
+              var properties = element.properties;
+              Object.keys(properties).forEach(function (propName, index) {
+                var propDef = properties[propName],
+                type = typeof propDef.type();
+                var property = {
+                  name: propName,
+                  description: propName,
+                  type: type
+                }
+                entity.properties.push(property);
+              });
+
+              var entities = DocParser.parse(text, entity);
+              if (!entities || entities.length === 0) {
+                entities = [{
+                  name: url.split('/').pop(),
+                  description: '**Undocumented**'
+                }];
+              }
+              self.value = entities;
+              self.fire('value-changed', {
+                value: self.value
+              });
+
+            }, function(event) {
+              // error; do nothing
             });
+
           }
         });
       }

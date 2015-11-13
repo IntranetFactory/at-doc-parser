@@ -1,9 +1,8 @@
-
 (function(scope) {
 
   var DocParser = {
-    parse: function(text) {
-      var top = {};
+    parse: function(text, existing) {
+      var top = existing;
       var entities = [];
       var current = top;
       var subCurrent = {};
@@ -22,7 +21,7 @@
         // unify line ends, remove all comment characters, split into individual lines
         var lines = m.replace(/\r\n/g, '\n').replace(/^\s*\/\*\*|^\s*\*\/|^\s*\* ?|^\s*\<\!-\-|^s*\-\-\>/gm, '').split('\n');
         // remove empty lines
-        lines = lines.filter(function (line) {
+        lines = lines.filter(function(line) {
           return line !== "";
         });
 
@@ -43,20 +42,20 @@
 
         // process pragmas
         pragmas.forEach(function(m) {
-          var pragma = m[1], content = m[2];
+          var pragma = m[1],
+            content = m[2];
           switch (pragma) {
 
             // currently all entities are either @class or @element
             case 'class':
             case 'element':
-              current = {
-                name: content,
-                description: code
-              };
+              current.name = content;
+              current.description = code;
+
               entities.push(current);
               break;
 
-            // an entity may have these describable sub-features
+              // an entity may have these describable sub-features
             case 'attribute':
             case 'property':
             case 'method':
@@ -65,11 +64,12 @@
                 name: content,
                 description: code
               };
+
               var label = pragma == 'property' ? 'properties' : pragma + 's';
               makePragma(current, label, subCurrent);
               break;
 
-            // sub-feature pragmas
+              // sub-feature pragmas
             case 'default':
             case 'type':
               subCurrent[pragma] = content;
@@ -113,7 +113,7 @@
               }
               break;
 
-            // everything else
+              // everything else
             default:
               current[pragma] = content;
               break;
@@ -124,16 +124,37 @@
         function makePragma(object, pragma, content) {
           var p$ = object;
           var p = p$[pragma];
+          var index, length, isFound, existing;
+
           if (!p) {
             p$[pragma] = p = [];
+          } else {
+            length = p.length;
+            for (index = 0; index < length; index++) {
+              if (p[index].name === content.name) {
+                isFound = true;
+                existing = p[index];
+                break;
+              }
+            }
+            if (isFound) {
+              Object.keys(content).forEach(function (key, index) {
+                existing[key] = content[key];
+              });
+              subCurrent = existing;
+            } else {
+              p.push(content);
+            }
           }
-          p.push(content);
         }
 
       });
 
       if (entities.length === 0) {
-        entities.push({name: 'Entity', description: '**Undocumented**'});
+        entities.push({
+          name: 'Entity',
+          description: '**Undocumented**'
+        });
       }
       return entities;
     }
