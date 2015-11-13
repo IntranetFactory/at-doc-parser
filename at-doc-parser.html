@@ -57,10 +57,17 @@
               Object.keys(properties).forEach(function (propName, index) {
                 var propDef = properties[propName],
                 type = typeof propDef.type();
+                var defValue = propDef.value;
+                if (_isFunction(propDef.value)) {
+                  defValue = propDef.value();
+                } else if (defValue === '') {
+                  defValue = 'empty';
+                }
                 var property = {
                   name: propName,
                   description: propName,
-                  type: type
+                  type: type,
+                  default: defValue
                 }
                 entity.properties.push(property);
               });
