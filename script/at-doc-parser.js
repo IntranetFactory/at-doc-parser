@@ -62,7 +62,8 @@
             case 'event':
               subCurrent = {
                 name: content,
-                description: code
+                description: code,
+                private: content.charAt(0) === '_' ? true : false
               };
 
               var label = pragma == 'property' ? 'properties' : pragma + 's';
