@@ -151,10 +151,11 @@
       });
 
       if (entities.length === 0) {
-        entities.push({
-          name: 'Entity',
-          description: '**Undocumented**'
-        });
+        entities.push(current);
+        // entities.push({
+        //   name: 'Entity',
+        //   description: '**Undocumented**'
+        // });
       }
       return entities;
     }
