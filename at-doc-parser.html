@@ -54,20 +54,27 @@
                 events: []
               };
               var properties = element.properties;
-              Object.keys(properties).forEach(function (propName, index) {
+              Object.keys(properties).forEach(function(propName, index) {
                 var propDef = properties[propName],
-                type = typeof propDef.type();
+                  type = typeof propDef.type();
                 var defValue = propDef.value;
                 if (_isFunction(propDef.value)) {
                   defValue = propDef.value();
                 } else if (defValue === '') {
                   defValue = 'empty';
                 }
+                var isEnum = propDef.xtype && propDef.xtype === 'enum' && propDef.xvaluelist;
+                var possibleValues = false;
+                if (isEnum) {
+                  possibleValues = self._constructPossibleValuesString(propDef.xvaluelist);
+                }
+
                 var property = {
                   name: propName,
                   description: '',
                   type: type,
-                  default: defValue
+                  default: defValue,
+                  possibleValues: possibleValues
                 }
                 entity.properties.push(property);
               });
@@ -90,6 +97,45 @@
 
           }
         });
+      },
+      _constructPossibleValuesString: function(xvaluelist) {
+        // xvaluelist can be CSV string, array of strings and array of {title, value} objects
+        // array of {title, value} objects doesn't make sense for documentation so it will be ignored
+        var result = false;
+        var partsArr;
+        var self = this;
+
+        if (this.isCSVString(xvaluelist)) {
+          partsArr = xvaluelist.split(',');
+        } else if (this.isArray(xvaluelist)) {
+          partsArr = xvaluelist;
+        }
+
+        var partsArrLength = partsArr.length;
+        if (partsArrLength > 0){
+          result = '';
+        }
+        partsArr.forEach(function(part, index) {
+          if (self.isString(part)) {
+            result = result + '' + part;
+            if (index < partsArrLength - 2) {
+              result = result + ', ';
+            } else if (index === partsArrLength - 2) {
+              result = result + ' and '
+            }
+          }
+        });
+
+        return result;
+      },
+      isString: function (obj) {
+        return Object.prototype.toString.call(obj) === "[object String]";
+      },
+      isCSVString: function (obj) {
+        return Object.prototype.toString.call(obj) === "[object String]" && obj.indexOf(',') !== -1;
+      },
+      isArray: function (obj) {
+        return Object.prototype.toString.call(obj) === "[object Array]";
       }
     });
   </script>
