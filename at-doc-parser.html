@@ -60,8 +60,13 @@
                 var defValue = propDef.value;
                 if (_isFunction(propDef.value)) {
                   defValue = propDef.value();
+                  if (self.isObject(defValue)) {
+                    defValue = JSON.stringify(defValue);
+                  }
                 } else if (defValue === '') {
                   defValue = 'empty';
+                } else if (self.isObject(propDef.value)){
+                  defValue = JSON.stringify(propDef.value);
                 }
                 var isEnum = propDef.xtype && propDef.xtype === 'enum' && propDef.xvaluelist;
                 var possibleValues = false;
@@ -125,6 +130,9 @@
         });
 
         return result;
+      },
+      isObject: function (obj) {
+        return Object.prototype.toString.call(obj) === "[object Object]";
       },
       isString: function (obj) {
         return Object.prototype.toString.call(obj) === "[object String]";
