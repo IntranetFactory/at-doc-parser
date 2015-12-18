@@ -38,11 +38,21 @@
 
           if (text) {
 
+            var elementName = '';
+            // determine element name
+            if (this.url.indexOf('/') === -1) {
+              // url is of format at-*-*.html
+              // strip .html
+              elementName = this.url.replace('.html', '');
+            } else {
+              // url is of format ../at-*-*/at-*-*.html
+              // split for '/'
+              var parts = this.url.split('/');
+              var part = parts[1];
+              elementName = part;
+            }
+
             self.importHref(self.url, function(event) {
-              // import successful
-              var importedContent = event.target.import;
-              var domModule = importedContent.querySelector('dom-module');
-              var elementName = domModule.getAttribute('id');
               var element = document.createElement(elementName);
               // we need this to find out the function names
               var elementProto = element.__proto__;
@@ -55,8 +65,14 @@
               };
               var properties = element.properties;
               Object.keys(properties).forEach(function(propName, index) {
-                var propDef = properties[propName],
-                  type = typeof propDef.type();
+                var propDef = properties[propName];
+                var type = 'string';
+                if (propDef.type) {
+                  var type = typeof propDef.type();
+                } else {
+                  console.log('Can not determine the type of ' + propDef.type + '.');
+                  console.log('Using type string instead.');
+                }
                 var defValue = propDef.value;
                 if (_isFunction(propDef.value)) {
                   defValue = propDef.value();
