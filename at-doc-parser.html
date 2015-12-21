@@ -66,12 +66,12 @@
               var properties = element.properties;
               Object.keys(properties).forEach(function(propName, index) {
                 var propDef = properties[propName];
-                var type = 'string';
+                var type = 'object';
                 if (propDef.type) {
                   var type = typeof propDef.type();
                 } else {
                   console.log('Can not determine the type of ' + propDef.type + '.');
-                  console.log('Using type string instead.');
+                  console.log('Using type object instead.');
                 }
                 var defValue = propDef.value;
                 if (_isFunction(propDef.value)) {
