@@ -24,14 +24,9 @@
       },
       _scopeCssViaAttr: true,
       ready: function() {
-        var
-          loader = this.$.loader,
-          url = this.url,
-          self = this;
-
-        var _isFunction = function(obj) {
-          return Object.prototype.toString.apply(obj) === "[object Function]";
-        }
+        var loader = this.$.loader;
+        var url = this.url;
+        var self = this;
 
         loader.addEventListener('response', function(event) {
           var text = event.detail;
@@ -66,39 +61,32 @@
               var properties = element.properties;
               Object.keys(properties).forEach(function(propName, index) {
                 var propDef = properties[propName];
-                var type = 'object';
-                if (propDef.type) {
-                  var type = typeof propDef.type();
-                } else {
-                  console.log('Can not determine the type of ' + propDef.type + '.');
-                  console.log('Using type object instead.');
-                }
-                var defValue = propDef.value;
-                if (_isFunction(propDef.value)) {
-                  defValue = propDef.value();
-                  if (self.isObject(defValue)) {
-                    defValue = JSON.stringify(defValue);
-                  }
-                } else if (defValue === '') {
-                  defValue = 'empty';
-                } else if (self.isObject(propDef.value)){
-                  defValue = JSON.stringify(propDef.value);
-                }
-                var isEnum = propDef.xtype && propDef.xtype === 'enum' && propDef.xvaluelist;
-                var possibleValues = false;
-                if (isEnum) {
-                  possibleValues = self._constructPossibleValuesString(propDef.xvaluelist);
-                }
-
-                var property = {
-                  name: propName,
-                  description: '',
-                  type: type,
-                  default: defValue,
-                  possibleValues: possibleValues
-                }
-                entity.properties.push(property);
+                var docProperty = self._constructDocProperty(propName, propDef);
+                entity.properties.push(docProperty);
               });
+
+              // to figure out stuff from comments behavior should be importHref'ed
+              // the trouble is how to figure out behavior name, and how to know what url to target
+              
+              // figure out properties in behaviors
+              if (self.isArray(element.behaviors)) {
+                var bi;
+                var bLen = element.behaviors.length;
+                var behavior;
+                var bProperties;
+                var bPropertyNames;
+                var propDef;
+                for (bi = 0; bi < bLen; bi += 1) {
+                  behavior = element.behaviors[bi];
+                  bProperties = behavior.properties;
+                  bPropertyNames = Object.keys(bProperties);
+                  bPropertyNames.forEach(function(propName, index) {
+                    propDef = bProperties[propName];
+                    var docProperty = self._constructDocProperty(propName, propDef);
+                    entity.properties.push(docProperty);
+                  });
+                }
+              }
 
               var entities = DocParser.parse(text, entity);
               if (!entities || entities.length === 0) {
@@ -119,6 +107,41 @@
           }
         });
       },
+      _constructDocProperty: function(propName, propDef) {
+        var type = 'object';
+        var self = this;
+        if (propDef.type) {
+          var type = typeof propDef.type();
+        } else {
+          console.log('Can not determine the type of ' + propDef.type + '.');
+          console.log('Using type object instead.');
+        }
+        var defValue = propDef.value;
+        if (self.isFunction(propDef.value)) {
+          defValue = propDef.value();
+          if (self.isObject(defValue)) {
+            defValue = JSON.stringify(defValue);
+          }
+        } else if (defValue === '') {
+          defValue = 'empty';
+        } else if (self.isObject(propDef.value)) {
+          defValue = JSON.stringify(propDef.value);
+        }
+        var isEnum = propDef.xtype && propDef.xtype === 'enum' && propDef.xvaluelist;
+        var possibleValues = false;
+        if (isEnum) {
+          possibleValues = self._constructPossibleValuesString(propDef.xvaluelist);
+        }
+
+        var docProperty = {
+          name: propName,
+          description: '',
+          type: type,
+          default: defValue,
+          possibleValues: possibleValues
+        };
+        return docProperty;
+      },
       _constructPossibleValuesString: function(xvaluelist) {
         // xvaluelist can be CSV string, array of strings and array of {title, value} objects
         // array of {title, value} objects doesn't make sense for documentation so it will be ignored
@@ -133,7 +156,7 @@
         }
 
         var partsArrLength = partsArr.length;
-        if (partsArrLength > 0){
+        if (partsArrLength > 0) {
           result = '';
         }
         partsArr.forEach(function(part, index) {
@@ -147,17 +170,20 @@
 
         return result;
       },
-      isObject: function (obj) {
+      isObject: function(obj) {
         return Object.prototype.toString.call(obj) === "[object Object]";
       },
-      isString: function (obj) {
+      isString: function(obj) {
         return Object.prototype.toString.call(obj) === "[object String]";
       },
-      isCSVString: function (obj) {
+      isCSVString: function(obj) {
         return Object.prototype.toString.call(obj) === "[object String]" && obj.indexOf(',') !== -1;
       },
-      isArray: function (obj) {
+      isArray: function(obj) {
         return Object.prototype.toString.call(obj) === "[object Array]";
+      },
+      isFunction: function(obj) {
+        return Object.prototype.toString.apply(obj) === "[object Function]";
       }
     });
   </script>
