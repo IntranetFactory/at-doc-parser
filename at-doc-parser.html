@@ -178,9 +178,12 @@
         partsArr.forEach(function(part, index) {
           if (self.isString(part)) {
             result = result + '' + part;
-            if (index < partsArrLength - 1) {
-              result = result + ', ';
-            }
+          } else if (self.isObject(part)) {
+            result = result + '' + part.value;
+          }
+
+          if (index < partsArrLength - 1) {
+            result = result + ', ';
           }
         });
 
