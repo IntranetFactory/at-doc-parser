@@ -3,8 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "dependencies": {
-    "tangere": "TangereJs/tangere#0.8-preview",
-    "at-core-activity": "TangereJs/at-core-activity#0.8-preview",
+    "tangere": "TangereJs/tangere#master",
+    "at-core-activity": "TangereJs/at-core-activity#master",
     "layout": "polymer/layout#master"
   }
 }
