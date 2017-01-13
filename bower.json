@@ -1,0 +1,10 @@
+{
+  "name": "at-doc-parser",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "tangere": "TangereJs/tangere#0.8-preview",
+    "at-core-activity": "TangereJs/at-core-activity#0.8-preview",
+    "layout": "polymer/layout#master"
+  }
+}
