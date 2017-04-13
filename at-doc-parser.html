@@ -50,24 +50,30 @@
 
             if (!alreadyImported) {
               self.importHref(self.url, function(event) {
-                self._processImportedElement(elementName, text);
+                var registration = Polymer.telemetry.registrations.find(function(element, index) {
+                  return element.is === elementName;
+                });
+
+                self._processImportedElement(registration, text);
               }, function(event) {
-                // error; do nothing
+                // Help for codemirror-hint-tag-attr
+                // if error occurred fire value changed with value of null
+                self.fire('value-changed', { value: null });
               }, true);
             } else {
-              self._processImportedElement(elementName, text);
+              self._processImportedElement(alreadyImported, text);
             }
           }
         });
       },
 
-      _processImportedElement: function (elementName, text) {
+      _processImportedElement: function (registration, text) {
         var self = this;
-        var element = document.createElement(elementName);
+        var element = registration;
         // we need this to find out the function names
         var elementProto = element.__proto__;
         var entity = {
-          name: elementName,
+          name: registration.is,
           description: '',
           properties: [],
           methods: [],
