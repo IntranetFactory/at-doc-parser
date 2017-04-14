@@ -139,10 +139,17 @@
       },
 
       _constructDocProperty: function(propName, propDef) {
+        function isFunction(obj) {
+          return Object.prototype.toString.apply(obj) === "[object Function]";
+        }
+
         var type = 'object';
         var self = this;
-        if (propDef.type) {
-          var type = typeof propDef.type();
+
+        if (isFunction(propDef)) {
+          type = propDef.name.toLowerCase();
+        } else if (isFunction(propDef.type)) {
+          type = propDef.type.name.toLowerCase();        
         } else {
           console.log('Can not determine the type of ' + propDef.type + '.');
           console.log('Using type object instead.');
