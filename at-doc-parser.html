@@ -40,8 +40,8 @@
               // url is of format ../at-*-*/at-*-*.html
               // split for '/'
               var parts = this.url.split('/');
-              var part = parts[1];
-              elementName = part;
+              var part = parts[parts.length-1];
+              elementName = part.replace('.html', '');
             }
 
             var alreadyImported = Polymer.telemetry.registrations.find(function (element, index) {
