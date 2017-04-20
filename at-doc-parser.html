@@ -70,8 +70,7 @@
       _processImportedElement: function (registration, text) {
         var self = this;
         var element = registration;
-        // we need this to find out the function names
-        var elementProto = element.__proto__;
+        
         var entity = {
           name: registration.is,
           description: '',
@@ -108,7 +107,9 @@
                 if (propName.indexOf("_") !== 0) {
                   propDef = bProperties[propName];
                   var docProperty = self._constructDocProperty(propName, propDef);
-                  entity.properties.push(docProperty);
+                  if (!entity.properties.find(function(item, index){ return item.name === this.name; }, docProperty)) {
+                    entity.properties.push(docProperty);
+                  }
                 }
               });
             }
