@@ -78,13 +78,14 @@
           methods: [],
           events: []
         };
-        var properties = element.properties;
+        var properties = element.properties;        
         Object.keys(properties).forEach(function(propName, index) {
-          if (propName.indexOf("_") !== 0) {
-            var propDef = properties[propName];
-            var docProperty = self._constructDocProperty(propName, propDef);
-            entity.properties.push(docProperty);
-          }
+          if (propName.indexOf("_") === 0) return;                     
+
+          var propDef = properties[propName];
+          var docProperty = self._constructDocProperty(propName, propDef);
+          entity.properties.push(docProperty);
+          
         });
 
         // to figure out stuff from comments behavior should be importHref'ed
@@ -92,28 +93,21 @@
 
         // figure out properties in behaviors
         if (self.isArray(element.behaviors)) {
-          var bi;
-          var bLen = element.behaviors.length;
-          var behavior;
-          var bProperties;
-          var bPropertyNames;
-          var propDef;
-          for (bi = 0; bi < bLen; bi += 1) {
-            behavior = element.behaviors[bi];
-            bProperties = behavior.properties;
-            if (bProperties) {
-              bPropertyNames = Object.keys(bProperties);
-              bPropertyNames.forEach(function(propName, index) {
-                if (propName.indexOf("_") !== 0) {
-                  propDef = bProperties[propName];
-                  var docProperty = self._constructDocProperty(propName, propDef);
-                  if (!entity.properties.find(function(item, index){ return item.name === this.name; }, docProperty)) {
-                    entity.properties.push(docProperty);
-                  }
-                }
-              });
-            }
-          }
+          element.behaviors.forEach(function(behavior, index){ 
+            if (!behavior.hasOwnProperty('properties')) return;
+
+            var bPropertyNames = Object.keys(behavior.properties);
+            bPropertyNames.forEach(function(propName, index) {
+              if (propName.indexOf("_") === 0) return;
+
+              var alreadyExists = entity.properties.find(function(item){ return item.name === propName });
+              if (alreadyExists) return;
+
+              var propDef = behavior.properties[propName];
+              var docProperty = self._constructDocProperty(propName, propDef);
+              entity.properties.push(docProperty);              
+            });
+          });
         }
 
         var entities = DocParser.parse(text, entity);
