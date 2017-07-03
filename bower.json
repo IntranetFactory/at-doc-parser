@@ -5,6 +5,6 @@
   "dependencies": {
     "tangere": "TangereJs/tangere#master",
     "at-core-activity": "TangereJs/at-core-activity#master",
-    "layout": "polymer/layout#master"
+    "layout": "TangereJs/layout#master"
   }
 }
