@@ -24,7 +24,10 @@
         var loader = this.$.loader;
         var url = this.url;
         var self = this;
-
+        
+        if(url.indexOf("../")==0) url = this.resolveUrl(this.url);
+        this.url = url;
+        
         loader.addEventListener('response', function(event) {
           var text = event.detail;
 
