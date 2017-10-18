@@ -47,15 +47,11 @@
               elementName = part.replace('.html', '');
             }
 
-            var alreadyImported = Polymer.telemetry.registrations.find(function (element, index) {
-              return element.is === elementName;
-            });
+            var alreadyImported = this._findInArray(Polymer.telemetry.registrations, 'is', elementName);
 
             if (!alreadyImported) {
               self.importHref(self.url, function(event) {
-                var registration = Polymer.telemetry.registrations.find(function(element, index) {
-                  return element.is === elementName;
-                });
+                var registration = this._findInArray(Polymer.telemetry.registrations, 'is', elementName);
 
                 self._processImportedElement(registration, text);
               }, function(event) {
@@ -103,7 +99,7 @@
             bPropertyNames.forEach(function(propName, index) {
               if (propName.indexOf("_") === 0) return;
 
-              var alreadyExists = entity.properties.find(function(item){ return item.name === propName });
+              var alreadyExists = this._findInArray(entity.properties, 'name', propName);
               if (alreadyExists) return;
 
               var propDef = behavior.properties[propName];
@@ -209,6 +205,18 @@
 
         return result;
       },
+
+      _findInArray: function(arr, propName, propValue) {
+        var found = undefined;
+
+        for (var i = 0; i < arr.length && !found; i++) {
+          var curr = arr[i];
+          found = curr[propName] === propValue ? curr : undefined;
+        }
+
+        return found;
+      },
+
       isObject: function(obj) {
         return Object.prototype.toString.call(obj) === "[object Object]";
       },
