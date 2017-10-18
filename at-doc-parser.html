@@ -35,23 +35,23 @@
 
             var elementName = '';
             // determine element name
-            if (this.url.indexOf('/') === -1) {
+            if (self.url.indexOf('/') === -1) {
               // url is of format at-*-*.html
               // strip .html
-              elementName = this.url.replace('.html', '');
+              elementName = self.url.replace('.html', '');
             } else {
               // url is of format ../at-*-*/at-*-*.html
               // split for '/'
-              var parts = this.url.split('/');
+              var parts = self.url.split('/');
               var part = parts[parts.length-1];
               elementName = part.replace('.html', '');
             }
 
-            var alreadyImported = this._findInArray(Polymer.telemetry.registrations, 'is', elementName);
+            var alreadyImported = self._findInArray(Polymer.telemetry.registrations, 'is', elementName);
 
             if (!alreadyImported) {
               self.importHref(self.url, function(event) {
-                var registration = this._findInArray(Polymer.telemetry.registrations, 'is', elementName);
+                var registration = self._findInArray(Polymer.telemetry.registrations, 'is', elementName);
 
                 self._processImportedElement(registration, text);
               }, function(event) {
@@ -99,7 +99,7 @@
             bPropertyNames.forEach(function(propName, index) {
               if (propName.indexOf("_") === 0) return;
 
-              var alreadyExists = this._findInArray(entity.properties, 'name', propName);
+              var alreadyExists = self._findInArray(entity.properties, 'name', propName);
               if (alreadyExists) return;
 
               var propDef = behavior.properties[propName];
