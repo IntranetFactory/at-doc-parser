@@ -143,7 +143,11 @@
         if (isFunction(propDef)) {
           type = propDef.name.toLowerCase();
         } else if (isFunction(propDef.type)) {
-          type = propDef.type.name.toLowerCase();        
+          if (propDef.type.name !== undefined) {
+            type = propDef.type.name.toLowerCase();
+          } else {
+            type = typeof propDef.type();
+          }
         } else {
           console.log('Can not determine the type of ' + propDef.type + '.');
           console.log('Using type object instead.');
