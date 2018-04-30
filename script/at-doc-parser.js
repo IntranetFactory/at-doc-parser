@@ -20,10 +20,6 @@
       docComments.forEach(function(m) {
         // unify line ends, remove all comment characters, split into individual lines
         var lines = m.replace(/\r\n/g, '\n').replace(/^\s*\/\*\*|^\s*\*\/|^\s*\* ?|^\s*\<\!-\-|^s*\-\-\>/gm, '').split('\n');
-        // remove empty lines
-        lines = lines.filter(function(line) {
-          return line !== "";
-        });
 
         // pragmas (@-rules) must occur on a line by themselves
         var pragmas = [];
