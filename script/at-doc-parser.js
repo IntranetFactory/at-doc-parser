@@ -56,6 +56,8 @@
             case 'property':
             case 'method':
             case 'event':
+              var nonemptyLines = lines.filter(function(line){ return line.length > 0; });
+              code = nonemptyLines.join('\n');
               subCurrent = {
                 name: content,
                 description: code,
