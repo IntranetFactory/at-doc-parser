@@ -1,7 +1,7 @@
 {
   "name": "at-doc-parser",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.0.3",
   "dependencies": {
     "tangere": "TangereJs/tangere#master",
     "at-core-activity": "TangereJs/at-core-activity#master",
